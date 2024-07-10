@@ -1,150 +1,91 @@
-from beautifultable import BeautifulTable
 
+contacts = []
 
-class Contact_Book:
-    def __init__(self):
-        self.__data = {}
-    
-    def addContact(self, name = None, address = None, phone_number = None, email = None):
-        if name != None and address != None and phone_number != None and email != None:
-            if phone_number not in self.__data:
-                self.__data[phone_number] = [name, address, phone_number, email]
-                print("Added successfully")
-            else:
-                print("Number already exists")
+def add_contact():
+    name = input("Enter name: ")
+    phone = input("Enter phone: ")
+    email = input("Enter email: ")
+    address = input("Enter address: ")
+    contacts.append({'name': name, 'phone': phone, 'email': email, 'address': address})
+    print(f"Contact {name} added successfully.")
+
+def view_contacts():
+    if not contacts:
+        print("No contacts found.")
+        return
+    print("\nContact List:")
+    for contact in contacts:
+        print(f"Name: {contact['name']}, Phone: {contact['phone']}, Email: {contact['email']}, Address: {contact['address']}")
+
+def search_contact():
+    if not contacts:
+        print("No contacts found.")
+        return
+    search_term = input("Enter name or phone to search: ")
+    results = [contact for contact in contacts if search_term.lower() in contact['name'].lower() or search_term in contact['phone']]
+    if not results:
+        print("No matching contacts found.")
+        return
+    print("\nSearch Results:")
+    for contact in results:
+        print(f"Name: {contact['name']}, Phone: {contact['phone']}, Email: {contact['email']}, Address: {contact['address']}")
+
+def update_contact():
+    if not contacts:
+        print("No contacts found to update.")
+        return
+    name = input("Enter name of the contact to update: ")
+    found = False
+    for contact in contacts:
+        if contact['name'] == name:
+            found = True
+            contact['phone'] = input("Enter new phone (leave blank to keep current): ") or contact['phone']
+            contact['email'] = input("Enter new email (leave blank to keep current): ") or contact['email']
+            contact['address'] = input("Enter new address (leave blank to keep current): ") or contact['address']
+            print(f"Contact {name} updated successfully.")
+            break
+    if not found:
+        print(f"Contact {name} not found.")
+
+def delete_contact():
+    if not contacts:
+        print("No contacts found to delete.")
+        return
+    name = input("Enter name of the contact to delete: ")
+    contacts
+    initial_length = len(contacts)
+    contacts = [contact for contact in contacts if contact['name'] != name]
+    if len(contacts) < initial_length:
+        print(f"Contact {name} deleted successfully.")
+    else:
+        print(f"Contact {name} not found.")
+
+def main():
+    while True:
+        print("\nContact Manager Menu")
+        print("1. Add Contact")
+        print("2. View Contact List")
+        print("3. Search Contact")
+        print("4. Update Contact")
+        print("5. Delete Contact")
+        print("6. Exit")
+        choice = input("Enter your choice: ")
+
+        if choice == '1':
+            add_contact()
+        elif choice == '2':
+            view_contacts()
+        elif choice == '3':
+            search_contact()
+        elif choice == '4':
+            update_contact()
+        elif choice == '5':
+            delete_contact()
+        elif choice == '6':
+            print("Exiting Contact Manager.")
+            break
         else:
-            print("Please enter all the values")
+            print("Invalid choice. Please try again.")
 
-
-    def deleteContact(self, phone_number = None):
-        if phone_number != None:
-            if phone_number in self.__data:
-                del self.__data[phone_number]
-                print("Deleted successfully")
-            else:
-                print("Phone number does not exists in the database")
-        else:
-            print("Please enter phone number")
-
-    def editContact(self, name = None, address = None, phone_number = None, email = None):
-        if phone_number != None and phone_number in self.__data:
-            lst_info = self.__data[phone_number]
-            if name != None:
-                lst_info[0] = name
-            if address != None:
-                lst_info[1] = address
-            if email != None:
-                lst_info[3] = email
-            self.__data[phone_number] = lst_info
-            print("Data updated successfully")
-        else:
-            print("Phone number does not exists in the database")
-
-
-    def searchContact(self, query = None, sort_field = None):
-        if query != None:
-            search_arr = []
-            for key, val in self.__data.items():
-                search_arr.append(val + [" ".join(val)])
-                        
-            result = set()
-            for word in query.lower().split():
-                for i in range(len(search_arr)):
-                    if word in search_arr[i][-1].lower():
-                        result.add(i)
-            
-            ans = []
-            for i in result:
-                ans.append(search_arr[i][:-1])
-            
-            indx = 0
-            if sort_field == "name":
-                indx = 0
-            if sort_field == "address":
-                indx = 1
-            if sort_field == "phone_number":
-                indx = 2
-            if sort_field == "email":
-                indx = 3
-            ans.sort(key= lambda x : x[indx])
-
-            self.viewContact(ans)
-        else:
-            return []
-
-    
-    def viewContact(self, data):
-        table = BeautifulTable()
-        for child_data in data:
-            table.rows.append(child_data)
-
-        table.rows.header = [str(i) for i in range(1, len(data) + 1)]
-        table.columns.header = ["name", "address", "phone_number", "email"]
-        print(table)
-
-    def console(self):
-        while True:
-            try:
-                print("\n1. Add Contact\n2. Delete Contact\n3. Edit Contact\n4. Search Contact\n5. View Contacts\n6. Stop")
-                n = int(input("Enter your options: "))
-                if n == 1:
-                    name = input("Name: ")
-                    address = input("Address: ")
-                    phone_number = input("Phone Number: ")
-                    email = input("Email: ")
-                    if len(name) == 0:
-                        name = None
-                    if len(address) == 0:
-                        address = None
-                    if len(phone_number) == 0:
-                        phone_number = None
-                    if len(email) == 0:
-                        email = None
-                    self.addContact(name, address, phone_number, email)
-
-                if n == 2:
-                    phone_number = input("Phone Number: ")
-                    if len(phone_number) == 0:
-                        phone_number = None
-                    self.deleteContact(phone_number)
-                
-                if n == 3:
-                    name = input("Name: ")
-                    address = input("Address: ")
-                    phone_number = input("Phone Number: ")
-                    email = input("Email: ")
-                    if len(name) == 0:
-                        name = None
-                    if len(address) == 0:
-                        address = None
-                    if len(phone_number) == 0:
-                        phone_number = None
-                    if len(email) == 0:
-                        email = None
-                    self.editContact(name, address, phone_number, email)
-                
-                if n == 4:
-                    query = input("Search: ")
-                    sort_by = input("Sort by: ")
-                    if len(query) == 0:
-                        query = None
-                    if len(sort_by) == 0:
-                        sort_by = None
-                    self.searchContact(query, sort_by)
-
-                if n == 5:
-                    new_data = []
-                    for key, val in self.__data.items():
-                        new_data.append(val)
-                    self.viewContact(new_data)
-                
-                if n == 6:
-                    break
-
-            except Exception as e:
-                pass
-
-
-
-contact_book = Contact_Book()
-contact_book.console()
+if __name__ == "__main__":
+    main()
